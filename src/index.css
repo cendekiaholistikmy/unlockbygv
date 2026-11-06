@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+/* ── UNLOCK tokens ────────────────────────────────────────────
+   Ink black + flame gradient, from the UNLOCK logo.
+   shadcn-style CSS variables so components in /components/ui
+   (bg-muted, text-foreground, border-border…) resolve here. */
+:root {
+  --ink: #0b0d14;
+  --ink-2: #151925;
+  --ink-3: #23283a;
+  --paper: #fff6ea;
+  --flame-a: #d4500f;
+  --flame-b: #f39a1e;
+  --flame-c: #ffd23f;
+  --flame: linear-gradient(100deg, var(--flame-a) 0%, var(--flame-b) 55%, var(--flame-c) 100%);
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --muted: #efe6d8;
+  --muted-foreground: #4a4f60;
+  --border: #0b0d14;
+  --card: #ffffff;
+  --primary: var(--ink);
+  --primary-foreground: #ffffff;
+  --accent: var(--flame-b);
+  --ring: var(--flame-b);
+  --radius: 1rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-ring: var(--ring);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-paper: var(--paper);
+  --color-flame-a: var(--flame-a);
+  --color-flame-b: var(--flame-b);
+  --color-flame-c: var(--flame-c);
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Archivo", "Arial Black", ui-sans-serif, sans-serif;
+  --font-brush: "Permanent Marker", cursive;
+  --radius-lg: var(--radius);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    margin: 0;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  ::selection {
+    background: var(--flame-c);
+    color: var(--ink);
+  }
+  :focus-visible {
+    outline: 3px solid var(--flame-b);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+    font-stretch: 118%;
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+  .text-flame {
+    background: var(--flame);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .bg-flame {
+    background: var(--flame);
+  }
+  .shadow-hard {
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+  .shadow-hard-flame {
+    box-shadow: 8px 8px 0 var(--flame-b);
+  }
+  .grain {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 3px 3px;
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 34s linear infinite;
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.6); }
+  100% { box-shadow: 0 0 0 10px rgba(255, 59, 48, 0); }
+}
+.live-dot {
+  animation: pulse-ring 1.4s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .live-dot {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
