@@ -12,7 +12,8 @@
  *   through the speaker form stays in that one browser only.
  *   The demo admin key is: demo
  */
-export const APPS_SCRIPT_URL = "";
+export const APPS_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbxMZKMWvEJxb_JJ-RwYrrn_ZM-3u3kX3vuL2p8t4oS7RxceW0HHDBXIEJHURVjS1B1qnw/exec";
 
 /** Fallback links, used until Settings in the sheet says otherwise. */
 export const DEFAULTS = {
