@@ -26,10 +26,33 @@ export function hari(s: Pick<Session, "date" | "time">) {
   return HARI[myt(startOf(s)).day];
 }
 
-export function timeLabel(s: Pick<Session, "date" | "time">) {
-  const { h, min } = myt(startOf(s));
+function clock(d: Date) {
+  const { h, min } = myt(d);
   const h12 = h % 12 === 0 ? 12 : h % 12;
   return `${h12}:${String(min).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
+}
+
+export function timeLabel(s: Pick<Session, "date" | "time">) {
+  return clock(startOf(s));
+}
+
+/** "3:00 PM to 5:00 PM" */
+export function timeRange(s: Pick<Session, "date" | "time" | "duration">) {
+  const start = startOf(s);
+  return `${clock(start)} to ${clock(new Date(start.getTime() + durationOf(s) * 60e3))}`;
+}
+
+export function durationOf(s: Partial<Pick<Session, "duration">>) {
+  const d = Number(s.duration);
+  return d > 0 ? d : 60;
+}
+
+export const ONLINE_VENUE = "GV Familia (Telegram)";
+export function venueOf(s: Partial<Pick<Session, "venue">>) {
+  return (s.venue || "").trim() || ONLINE_VENUE;
+}
+export function isOnline(s: Partial<Pick<Session, "venue">>) {
+  return !(s.venue || "").trim();
 }
 
 export function dateLabel(s: Pick<Session, "date" | "time">, withYear = true) {
@@ -42,7 +65,8 @@ export function shortDate(s: Pick<Session, "date" | "time">) {
   return `${String(p.date).padStart(2, "0")}.${String(p.month + 1).padStart(2, "0")}.${String(p.year).slice(2)}`;
 }
 
-export const LIVE_WINDOW_MIN = 75;
+/** Extra minutes the LIVE badge stays on after the planned end. */
+export const LIVE_GRACE_MIN = 15;
 
 /**
  * What the public sees. A session marked Upcoming switches to Live by itself
@@ -56,7 +80,7 @@ export function effectiveStatus(
 ): SessionStatus {
   if (s.status === "Draft" || s.status === "Cancelled") return s.status;
   const start = startOf(s).getTime();
-  const end = start + LIVE_WINDOW_MIN * 60e3;
+  const end = start + (durationOf(s) + LIVE_GRACE_MIN) * 60e3;
   if (s.status === "Live") return "Live";
   if (s.status === "Recorded") return "Recorded";
   // Upcoming
@@ -89,14 +113,14 @@ export const TRACK_COLOR: Record<Track, string> = {
 /** Google Calendar "add event" link for one session. */
 export function gcalUrl(s: Session) {
   const start = startOf(s);
-  const end = new Date(start.getTime() + 60 * 60e3);
+  const end = new Date(start.getTime() + durationOf(s) * 60e3);
   const f = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
   const q = new URLSearchParams({
     action: "TEMPLATE",
     text: `${episodeLabel(s.episode)}: ${s.title}`,
     dates: `${f(start)}/${f(end)}`,
-    details: `UNLOCK by GengVolunteers 2.0. ${s.summary || ""}\nLive in GV Familia on Telegram.`,
-    location: "GV Familia (Telegram)",
+    details: `UNLOCK by GengVolunteers 2.0. ${s.summary || ""}\n${isOnline(s) ? "Live in GV Familia on Telegram." : `At ${venueOf(s)}.`}`,
+    location: venueOf(s),
     ctz: "Asia/Kuala_Lumpur",
   });
   return `https://calendar.google.com/calendar/render?${q.toString()}`;

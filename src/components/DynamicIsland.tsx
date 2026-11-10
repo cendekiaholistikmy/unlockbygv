@@ -2,7 +2,7 @@ import * as React from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { CalendarPlus, Check, ChevronDown, Info, Radio, TriangleAlert, X } from "lucide-react";
 import { useData, useNow, go } from "@/lib/store";
-import { compactCountdown, countdownParts, dateLabel, episodeLabel, gcalUrl, startOf, timeLabel } from "@/lib/format";
+import { compactCountdown, countdownParts, dateLabel, episodeLabel, gcalUrl, isOnline, startOf, timeRange, venueOf } from "@/lib/format";
 import { posterFor } from "@/lib/poster";
 import { cn } from "@/lib/utils";
 
@@ -226,13 +226,13 @@ function DynamicIsland({ toast, onDismissToast }: { toast: Toast | null; onDismi
               )}
 
               <div className="mt-2 px-1 text-xs text-white/60">
-                {dateLabel(focus)} · {timeLabel(focus)} · GV Familia (Telegram)
+                {dateLabel(focus)} · {timeRange(focus)} · {venueOf(focus)}
               </div>
 
               <div className="mt-3 flex gap-2">
                 {live ? (
                   <a href={joinHref} target="_blank" rel="noopener" className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#FF453A] py-2.5 text-sm font-bold">
-                    <Radio size={16} /> Join live
+                    <Radio size={16} /> {isOnline(live!) ? "Join live" : "Happening now"}
                   </a>
                 ) : (
                   <a href={gcalUrl(focus)} target="_blank" rel="noopener" className="flex flex-1 items-center justify-center gap-2 rounded-full bg-flame py-2.5 text-sm font-bold text-ink">

@@ -30,7 +30,7 @@ import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { StatusBadge } from "@/components/SessionCard";
 import { useData } from "@/lib/store";
 import { compressImage } from "@/lib/image";
-import { dateLabel, effectiveStatus, episodeLabel, imageUrl, timeLabel, uid } from "@/lib/format";
+import { dateLabel, effectiveStatus, episodeLabel, imageUrl, timeRange, uid, venueOf } from "@/lib/format";
 import { posterFor } from "@/lib/poster";
 import { standardTasks } from "@/data/seed";
 import {
@@ -399,6 +399,8 @@ function blankSession(db: AdminData): Session {
     status: "Upcoming",
     date: "",
     time: db.settings.defaultTime || "21:00",
+    duration: 60,
+    venue: "",
     speaker: "",
     speakerTitle: "",
     speakerPhoto: "",
@@ -443,7 +445,7 @@ function SessionsTab({ db, adminKey, run }: { db: AdminData; adminKey: string; r
               </div>
               <div className="mt-1 truncate font-extrabold">{s.title || "Untitled"}</div>
               <div className="truncate text-sm text-muted-foreground">
-                {s.date ? `${dateLabel(s)} · ${timeLabel(s)}` : "No date"} · {s.speaker || "No speaker"}
+                {s.date ? `${dateLabel(s)} · ${timeRange(s)}` : "No date"} · {venueOf(s)} · {s.speaker || "No speaker"}
               </div>
             </div>
             <span className="text-xs font-extrabold tracking-[0.12em] text-flame-a">{s.track}</span>
@@ -536,6 +538,12 @@ function SessionEditor({ initial, exists, hasPlan, adminKey, onClose, onSave, on
         <Field label="Time (Malaysia)" htmlFor="tm">
           <Input id="tm" type="time" value={s.time} onChange={(e) => set("time", e.target.value)} />
         </Field>
+        <Field label="Duration (minutes)" hint="The LIVE badge stays on until 15 min after this." htmlFor="du">
+          <Input id="du" type="number" min={15} step={15} value={s.duration || 60} onChange={(e) => set("duration", Number(e.target.value) || 60)} />
+        </Field>
+        <Field label="Venue" hint="Leave empty for online in GV Familia (Telegram)." htmlFor="ve">
+          <Input id="ve" value={s.venue || ""} onChange={(e) => set("venue", e.target.value)} placeholder="e.g. IRC Level 5, UNITEN" />
+        </Field>
         <Field label="Status" hint="Leave on Upcoming; it goes Live and then Recording by itself." htmlFor="st">
           <Select id="st" value={s.status} onChange={(e) => set("status", e.target.value as Session["status"])}>
             {SESSION_STATUSES.map((t) => <option key={t}>{t}</option>)}
@@ -563,7 +571,7 @@ function SessionEditor({ initial, exists, hasPlan, adminKey, onClose, onSave, on
           <PhotoPicker adminKey={adminKey} label="Speaker photo" aspect="aspect-square" value={s.speakerPhoto ? [s.speakerPhoto] : []} onChange={(v) => set("speakerPhoto", v[0] ?? "")} />
         </div>
         <div className="flex flex-col gap-5">
-          <Field label="Live link" hint="Telegram or Meet link for the night" htmlFor="ll">
+          <Field label="Live link" hint="Telegram or Meet link, or a Google Maps link for a physical venue" htmlFor="ll">
             <Input id="ll" value={s.liveUrl} onChange={(e) => set("liveUrl", e.target.value)} placeholder="https://t.me/…" />
           </Field>
           <Field label="Recording link" hint="YouTube or Google Drive video" htmlFor="rl">

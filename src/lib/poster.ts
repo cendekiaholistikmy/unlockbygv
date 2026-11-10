@@ -1,5 +1,5 @@
 import type { Session, Track } from "./types";
-import { episodeLabel, imageUrl, shortDate, hari, timeLabel, TRACK_COLOR } from "./format";
+import { episodeLabel, imageUrl, isOnline, shortDate, hari, timeLabel, TRACK_COLOR, venueOf } from "./format";
 
 /**
  * Branded fallback posters, drawn as SVG on the fly. Any session without an
@@ -60,6 +60,7 @@ ${lines
   .join("")}
 <rect x="96" y="740" rx="28" width="${s.track.length * 26 + 70}" height="56" fill="${trackFill}" stroke="#FFFFFF" stroke-opacity=".25"/>
 <text x="131" y="779" font-family="${FONT}" font-size="28" font-weight="900" fill="${trackText}" letter-spacing="4">${esc(s.track)}</text>
+${isOnline(s) ? "" : `<text x="1504" y="720" text-anchor="end" font-family="${FONT}" font-size="30" font-weight="900" fill="#F39A1E" letter-spacing="2">${esc(venueOf(s).toUpperCase())}</text>`}
 <text x="1504" y="779" text-anchor="end" font-family="${FONT}" font-size="34" font-weight="900" fill="#FFFFFF">${esc(`${hari(s).toUpperCase()} · ${shortDate(s)} · ${timeLabel(s)}`)}</text>
 </svg>`;
   return toData(svg);

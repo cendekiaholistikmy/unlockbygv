@@ -20,6 +20,10 @@ export type Session = {
   date: string;
   /** HH:mm, 24 hour, Malaysia time */
   time: string;
+  /** Minutes. Sets the Live window and the calendar invite length. */
+  duration: number;
+  /** Where it happens. Empty = online in GV Familia (Telegram). */
+  venue: string;
   speaker: string;
   speakerTitle: string;
   speakerPhoto: string;

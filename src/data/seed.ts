@@ -8,6 +8,8 @@ import { DEFAULTS } from "@/config";
  * Anything in [square brackets] is a placeholder to replace.
  */
 const base = {
+  duration: 60,
+  venue: "",
   speakerPhoto: "",
   poster: "",
   gallery: [] as string[],

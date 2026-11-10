@@ -7,7 +7,7 @@ import { Reveal, Eyebrow, Heading } from "@/components/Reveal";
 import { SessionCard } from "@/components/SessionCard";
 import { useData, useNow } from "@/lib/store";
 import { bandImages, posterFor } from "@/lib/poster";
-import { countdownParts, dateLabel, episodeLabel, gcalUrl, startOf, timeLabel, TRACK_COPY } from "@/lib/format";
+import { countdownParts, dateLabel, episodeLabel, gcalUrl, startOf, timeRange, TRACK_COPY, venueOf } from "@/lib/format";
 import { TRACKS } from "@/lib/types";
 
 const BASE = import.meta.env.BASE_URL;
@@ -166,7 +166,7 @@ function Spotlight() {
           <span className="font-medium text-muted-foreground">{s.speakerTitle ? `, ${s.speakerTitle}` : ""}</span>
         </p>
         <div className="font-bold">
-          {dateLabel(s)} · {timeLabel(s)} <span className="font-medium text-muted-foreground">· GV Familia (Telegram)</span>
+          {dateLabel(s)} · {timeRange(s)} <span className="font-medium text-muted-foreground">· {venueOf(s)}</span>
         </div>
         {!live && (
           <div className="grid max-w-md grid-cols-4 gap-2">

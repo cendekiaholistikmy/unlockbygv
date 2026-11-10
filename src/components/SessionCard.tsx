@@ -1,8 +1,8 @@
 import * as React from "react";
 import { motion } from "motion/react";
-import { ArrowUpRight, Images, PlayCircle } from "lucide-react";
+import { ArrowUpRight, Images, MapPin, PlayCircle } from "lucide-react";
 import type { Session, SessionStatus } from "@/lib/types";
-import { dateLabel, episodeLabel, timeLabel } from "@/lib/format";
+import { dateLabel, episodeLabel, isOnline, timeLabel, venueOf } from "@/lib/format";
 import { posterFor } from "@/lib/poster";
 import { cn } from "@/lib/utils";
 
@@ -73,6 +73,11 @@ export function SessionCard({ s, status, index = 0 }: { s: Session; status: Sess
           {s.speaker}
           {s.speakerTitle ? `, ${s.speakerTitle}` : ""}
         </p>
+        {!isOnline(s) && (
+          <p className="flex items-center gap-1.5 text-sm font-bold text-flame-a">
+            <MapPin size={14} /> {venueOf(s)}
+          </p>
+        )}
         <div className="mt-auto flex items-center justify-between pt-3 text-sm font-bold">
           <span>
             {dateLabel(s, false)} · {timeLabel(s)}

@@ -22,7 +22,7 @@ var MAX_PHOTOS = 4;
 var MAX_PHOTO_CHARS = 4 * 1024 * 1024; // ~3 MB image as base64
 
 var SHEETS = {
-  Sessions: ['ID', 'Episode', 'Title', 'Track', 'Status', 'Date', 'Time', 'Day', 'Speaker', 'Speaker Title', 'Speaker Photo', 'Poster', 'Gallery', 'Recording URL', 'Live URL', 'Summary', 'Takeaways', 'Published', 'Updated'],
+  Sessions: ['ID', 'Episode', 'Title', 'Track', 'Status', 'Date', 'Time', 'Day', 'Speaker', 'Speaker Title', 'Speaker Photo', 'Poster', 'Gallery', 'Recording URL', 'Live URL', 'Summary', 'Takeaways', 'Published', 'Updated', 'Duration', 'Venue'],
   Guests: ['ID', 'Timestamp', 'Type', 'Status', 'Name', 'Email', 'Phone', 'Organisation', 'Role', 'Topic', 'Track', 'Abstract', 'Preferred Night', 'Preferred Date', 'Links', 'Photos', 'Source', 'Session ID', 'Notes', 'PDPA Consent'],
   Planning: ['ID', 'Session ID', 'Session', 'Task', 'Owner', 'Due', 'Status', 'Link', 'Notes'],
   Settings: ['Key', 'Value', 'What it does'],
@@ -156,6 +156,8 @@ function readSessions_() {
       status: String(r['Status'] || 'Upcoming'),
       date: asDate_(r['Date']),
       time: asTime_(r['Time']),
+      duration: Number(r['Duration']) > 0 ? Number(r['Duration']) : 60,
+      venue: String(r['Venue'] || ''),
       speaker: String(r['Speaker'] || ''),
       speakerTitle: String(r['Speaker Title'] || ''),
       speakerPhoto: String(r['Speaker Photo'] || ''),
@@ -196,6 +198,8 @@ function saveSession_(s) {
     'Takeaways': (s.takeaways || []).join('\n'),
     'Published': !!s.published,
     'Updated': new Date(),
+    'Duration': Number(s.duration) > 0 ? Number(s.duration) : 60,
+    'Venue': clean_(s.venue, 200),
   });
 }
 
@@ -373,8 +377,19 @@ function toRow_(head, obj, existing) {
   return head.map(function (h, i) { return Object.prototype.hasOwnProperty.call(obj, h) ? obj[h] : (existing ? existing[i] : ''); });
 }
 
+/** Adds any column the code knows about but the sheet doesn't have yet (at the end). */
+function ensureHeaders_(sh, keys) {
+  var head = headers_(sh);
+  var missing = keys.filter(function (k) { return head.indexOf(k) < 0; });
+  if (missing.length) {
+    sh.getRange(1, head.length + 1, 1, missing.length).setValues([missing])
+      .setFontWeight('bold').setBackground('#0B0D14').setFontColor('#FFFFFF');
+  }
+  return headers_(sh);
+}
+
 function upsertObject_(name, id, obj) {
-  var sh = sheet_(name), head = headers_(sh), r = rowOf_(sh, id);
+  var sh = sheet_(name), head = ensureHeaders_(sh, Object.keys(obj)), r = rowOf_(sh, id);
   if (r > 0) {
     var range = sh.getRange(r, 1, 1, head.length);
     range.setValues([toRow_(head, obj, range.getValues()[0])]);
@@ -492,6 +507,8 @@ function setup() {
     if (sh.getLastRow() === 0) {
       sh.getRange(1, 1, 1, head.length).setValues([head]).setFontWeight('bold').setBackground('#0B0D14').setFontColor('#FFFFFF');
       sh.setFrozenRows(1);
+    } else {
+      ensureHeaders_(sh, head);
     }
   });
   var st = ss.getSheetByName('Settings');

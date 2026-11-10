@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { CalendarPlus, ChevronLeft, ChevronRight, Link2, Radio, X } from "lucide-react";
 import type { Session } from "@/lib/types";
 import { useData, useNow } from "@/lib/store";
-import { countdownParts, dateLabel, embedUrl, episodeLabel, gcalUrl, imageUrl, startOf, timeLabel, TRACK_COPY } from "@/lib/format";
+import { countdownParts, dateLabel, embedUrl, episodeLabel, gcalUrl, imageUrl, isOnline, startOf, timeRange, TRACK_COPY, venueOf } from "@/lib/format";
 import { posterFor } from "@/lib/poster";
 import { StatusBadge } from "./SessionCard";
 import { ButtonLink } from "./ui/button";
@@ -101,7 +101,7 @@ export function SessionModal({ session, onClose }: { session: Session; onClose: 
             </div>
             <div className="text-right text-sm font-bold">
               <div>{dateLabel(session)}</div>
-              <div className="text-muted-foreground">{timeLabel(session)} · GV Familia (Telegram)</div>
+              <div className="text-muted-foreground">{timeRange(session)} · {venueOf(session)}</div>
             </div>
           </div>
 
@@ -126,7 +126,7 @@ export function SessionModal({ session, onClose }: { session: Session; onClose: 
           <div className="flex flex-wrap gap-3">
             {status === "Live" && (
               <ButtonLink href={session.liveUrl || settings.telegramUrl} target="_blank" rel="noopener" variant="ink" className="bg-[#FF3B30] border-[#FF3B30]">
-                <Radio size={18} /> Join live now
+                <Radio size={18} /> {isOnline(session) ? "Join live now" : `Happening now at ${venueOf(session)}`}
               </ButtonLink>
             )}
             {status === "Upcoming" && (
